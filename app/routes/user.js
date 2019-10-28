@@ -2,10 +2,14 @@ module.exports = function (app, db) {
 
     let usersCollection = db.collection('users');
 
-    /* Cria Usuário */
+    app.route('/users').get((req, res) => {
+        usersCollection.find({}).toArray((err, result) => {
+            if (err)
+                throw err;
+            res.json(result);
+        });
 
-    app.post('/users/new-user', (req, res) => {
-
+    }).post((req, res) => {
         const user = {
             user: req.body.user.toLowerCase(),
             name: req.body.name,
@@ -20,22 +24,12 @@ module.exports = function (app, db) {
             res.send('User inserted sucessfully');
         });
 
+
     });
-
-    /* Lista usuários */
-
-    app.get('/users/get-users', (req, res) => {
-        usersCollection.find({}).toArray((err, result) => {
-            if (err)
-                throw err;
-            res.json(result);
-        });
-    });
-
 
     /* Busca usuário pelo username */
 
-    app.get('/users/find/:username', (req, res, next) => {
+    app.route('/users/:username').get((req, res, next) => {
         const username = req.params.username ? req.params.username : null;
 
         if (!username)
@@ -46,11 +40,7 @@ module.exports = function (app, db) {
                 throw err;
             res.json(result);
         });
-    });
-
-    /* Atualiza usuário */
-
-    app.put('/users/update/:username', (req, res) => {
+    }).put((req, res) => {
         const username = req.params.username ? req.params.username : null;
         const data = req.body;
 
@@ -64,11 +54,7 @@ module.exports = function (app, db) {
         } catch (err) {
             return res.send('Erro ao atualizar o usuário');
         }
-    });
-
-    /* Deleta usuário */
-
-    app.delete('/users/delete/:username', (req, res) => {
+    }).delete((req, res) => {
         const username = req.params.username ? req.params.username : null;
 
         if (!username)
